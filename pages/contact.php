@@ -13,9 +13,9 @@ include_once '../includes/header.php';
                     <h2 class="card-title">Get in Touch</h2>
                     <p><strong>Email:</strong> admin@lms.com</p>
                     <p><strong>Phone:</strong> +(84) 123 456 789</p>
-                    <p><strong>Address:</strong> ........., Can Thơ, Vietnam</p>
+                    <p><strong>Address:</strong> Road No. 22, Thuong Thanh, Cai Rang, Can Tho</p>
                     <p>
-                        We’re here to assist you with any questions or feedback about our Learning Management System.
+                        We are here to assist you with any questions or feedback about our Learning Management System.
                         Fill out the form or reach out directly!
                     </p>
                 </div>

@@ -14,11 +14,11 @@ if (!in_array($action, ['create', 'edit', 'submit', 'delete'])) {
     exit();
 }
 
-$isAdmin = $currentUser['role'] === 'admin';
+$isInstructor = in_array($currentUser['role'], ['admin', 'instructor']);
 
 try {
     if ($action === 'create') {
-        if (!$isAdmin) {
+        if (!$isInstructor) {
             header("Location: $redirectUrl?error=unauthorized");
             exit();
         }
@@ -49,7 +49,7 @@ try {
         exit();
 
     } elseif ($action === 'edit') {
-        if (!$isAdmin) {
+        if (!$isInstructor) {
             header("Location: $redirectUrl?error=unauthorized");
             exit();
         }
@@ -80,7 +80,7 @@ try {
         exit();
 
     } elseif ($action === 'submit') {
-        if ($isAdmin) {
+        if ($isInstructor) {
             header("Location: $redirectUrl?error=unauthorized");
             exit();
         }
@@ -101,7 +101,6 @@ try {
             exit();
         }
 
-        // If due_date is set and expired
         if ($assignment['due_date'] && strtotime($assignment['due_date']) < time()) {
             header("Location: $redirectUrl?error=upload_failed");
             exit();
@@ -163,7 +162,7 @@ try {
         exit();
 
     } elseif ($action === 'delete') {
-        if (!$isAdmin) {
+        if (!$isInstructor) {
             header("Location: $redirectUrl?error=unauthorized");
             exit();
         }

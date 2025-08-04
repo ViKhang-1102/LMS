@@ -17,7 +17,10 @@ $currentUser = getCurrentUser($pdo);
             <ul class="navbar-nav me-auto">
                 <?php if ($currentUser && $currentUser['role'] !== 'admin'): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="/pages/dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                        <a class="nav-link" href="/pages/dashboard.php">
+                            <i class="fas fa-tachometer-alt"></i> 
+                            <?php echo $currentUser['role'] === 'instructor' ? 'Instructor Dashboard' : 'Dashboard'; ?>
+                        </a>
                     </li>
                 <?php endif; ?>
 
@@ -25,6 +28,9 @@ $currentUser = getCurrentUser($pdo);
                     <li class="nav-item">
                         <a class="nav-link" href="/admin/dashboard.php"><i class="fas fa-user-shield"></i> Admin Dashboard</a>
                     </li>
+                <?php endif; ?>
+
+                <?php if ($currentUser && in_array($currentUser['role'], ['admin', 'instructor'])): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="/pages/courses.php"><i class="fas fa-book"></i> Courses</a>
                     </li>

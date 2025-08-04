@@ -116,7 +116,7 @@ try {
                                 <h5 class="course-title"><?php echo htmlspecialchars($course['title']); ?></h5>
                                 <p class="course-desc"><?php echo htmlspecialchars(substr($course['description'], 0, 100)) . (strlen($course['description']) > 100 ? '...' : ''); ?></p>
                                 <p class="mb-1"><strong>Price:</strong> $<?php echo number_format($course['price'], 2); ?></p>
-                                <p class="mb-1"><strong>Instructor:</strong> <?php echo htmlspecialchars($course['instructor_name']); ?></p>
+                                <p class="mb-1"><strong>Creator:</strong> <?php echo htmlspecialchars($course['instructor_name']); ?></p>
                                 <p class="mb-1"><small><strong>Created:</strong> <?php echo date('F j, Y', strtotime($course['created_at'])); ?></small></p>
                             </div>
                             <div class="card-footer bg-white border-top-0">

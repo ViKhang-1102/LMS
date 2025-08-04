@@ -1,41 +1,41 @@
 <?php
 include_once '../includes/auth.php';
-protectPage(['admin']); 
+protectPage(['admin']);
 
 include_once '../config/db.php';
 
-$currentUser = getCurrentUser($pdo);
-
 try {
-    $stmt = $pdo->prepare("SELECT c.id, c.title, c.description, c.price, c.created_at, u.username AS instructor 
-                           FROM courses c 
-                           JOIN users u ON c.instructor_id = u.id 
-                           ORDER BY c.created_at DESC");
-    $stmt->execute();
-    $courses = $stmt->fetchAll();
-} catch (PDOException $e) {
-    error_log("Error fetching courses: " . $e->getMessage());
-    $courses = [];
-}
-
-$editCourse = null;
-if (isset($_GET['edit_id'])) {
-    try {
-        $stmt = $pdo->prepare("SELECT id, title, description, price, instructor_id FROM courses WHERE id = ?");
-        $stmt->execute([$_GET['edit_id']]);
-        $editCourse = $stmt->fetch();
-    } catch (PDOException $e) {
-        error_log("Error fetching course for edit: " . $e->getMessage());
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'delete' && isset($_POST['course_id'])) {
+        $courseId = intval($_POST['course_id']);
+        try {
+            $stmt = $pdo->prepare("DELETE FROM courses WHERE id = ?");
+            $stmt->execute([$courseId]);
+            if ($stmt->rowCount() === 0) {
+                header('Location: manage_courses.php?error=delete_failed_no_course');
+                exit;
+            }
+            header('Location: manage_courses.php?success=deleted');
+            exit;
+        } catch (PDOException $e) {
+            error_log("Error deleting course: " . $e->getMessage());
+            header('Location: manage_courses.php?error=delete_failed&message=' . urlencode($e->getMessage()));
+            exit;
+        }
     }
-}
 
-try {
-    $stmt = $pdo->prepare("SELECT id, username FROM users WHERE role = 'admin'");
+    $stmt = $pdo->prepare("
+        SELECT c.id, c.title, c.price, c.created_at, c.image_path,
+               u.username AS instructor_name
+        FROM courses c
+        LEFT JOIN users u ON c.instructor_id = u.id
+        ORDER BY c.created_at DESC
+        LIMIT 5
+    ");
     $stmt->execute();
-    $instructors = $stmt->fetchAll();
+    $recentCourses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    error_log("Error fetching instructors: " . $e->getMessage());
-    $instructors = [];
+    error_log("Error fetching recent courses: " . $e->getMessage());
+    $recentCourses = [];
 }
 
 include_once '../includes/header.php';
@@ -46,26 +46,20 @@ include_once '../includes/header.php';
 <?php if (isset($_GET['error'])): ?>
     <div class="alert alert-danger" role="alert">
         <?php
-        if ($_GET['error'] == 'create_failed') {
-            echo 'Failed to create course!';
-        } elseif ($_GET['error'] == 'update_failed') {
-            echo 'Failed to update course!';
-        } elseif ($_GET['error'] == 'delete_failed') {
-            echo 'Failed to delete course!';
+        if ($_GET['error'] == 'delete_failed') {
+            echo 'Failed to delete course: ' . (isset($_GET['message']) ? htmlspecialchars($_GET['message']) : 'Unknown error');
+        } elseif ($_GET['error'] == 'delete_failed_no_course') {
+            echo 'Cannot delete course: Course does not exist.';
         } else {
-            echo 'An error occurred. Please try again!';
+            echo 'An error occurred, please try again!';
         }
         ?>
     </div>
 <?php elseif (isset($_GET['success'])): ?>
     <div class="alert alert-success" role="alert">
         <?php
-        if ($_GET['success'] == 'created') {
-            echo 'Course created successfully!';
-        } elseif ($_GET['success'] == 'updated') {
-            echo 'Course updated successfully!';
-        } elseif ($_GET['success'] == 'deleted') {
-            echo 'Course deleted successfully!';
+        if ($_GET['success'] == 'deleted') {
+            echo 'Course has been deleted!';
         }
         ?>
     </div>
@@ -73,82 +67,42 @@ include_once '../includes/header.php';
 
 <div class="card mb-4">
     <div class="card-header">
-        <h3><i class="fas fa-plus-circle"></i> <?php echo $editCourse ? 'Edit Course' : 'Create New Course'; ?></h3>
+        <h3><i class="fas fa-book"></i> Recent Courses</h3>
     </div>
     <div class="card-body">
-        <form action="/controllers/course_action.php" method="POST">
-            <?php if ($editCourse): ?>
-                <input type="hidden" name="action" value="update">
-                <input type="hidden" name="course_id" value="<?php echo $editCourse['id']; ?>">
-            <?php else: ?>
-                <input type="hidden" name="action" value="create">
-            <?php endif; ?>
-            <div class="mb-3">
-                <label for="title" class="form-label">Course Title</label>
-                <input type="text" class="form-control" id="title" name="title" required value="<?php echo $editCourse ? htmlspecialchars($editCourse['title']) : ''; ?>">
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label>
-                <textarea class="form-control" id="description" name="description" rows="4"><?php echo $editCourse ? htmlspecialchars($editCourse['description']) : ''; ?></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="price" class="form-label">Price (0 for free)</label>
-                <input type="number" class="form-control" id="price" name="price" required min="0" value="<?php echo $editCourse ? htmlspecialchars($editCourse['price']) : '0'; ?>">
-            </div>
-            <div class="mb-3">
-                <label for="instructor_id" class="form-label">Instructor</label>
-                <select class="form-control" id="instructor_id" name="instructor_id" required>
-                    <option value="">Select Instructor</option>
-                    <?php foreach ($instructors as $instructor): ?>
-                        <option value="<?php echo $instructor['id']; ?>" <?php echo $editCourse && $editCourse['instructor_id'] == $instructor['id'] ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($instructor['username']); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="d-grid">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> <?php echo $editCourse ? 'Update' : 'Create'; ?></button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<div class="card mb-4">
-    <div class="card-header">
-        <h3><i class="fas fa-book"></i> Course List</h3>
-    </div>
-    <div class="card-body">
-        <?php if (empty($courses)): ?>
+        <?php if (empty($recentCourses)): ?>
             <p>No courses found.</p>
         <?php else: ?>
-            <table class="table table-striped">
+            <table class="table table-striped align-middle text-center">
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Price</th>
-                        <th>Instructor</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
+                        <th style="width: 25%; text-align: left;">Title</th>
+                        <th style="width: 10%;">Price</th>
+                        <th style="width: 15%;">Creator</th>
+                        <th style="width: 15%;">Image</th>
+                        <th style="width: 20%;">Created At</th>
+                        <th style="width: 15%;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($courses as $course): ?>
+                    <?php foreach ($recentCourses as $course): ?>
                         <tr>
-                            <td><?php echo htmlspecialchars($course['title']); ?></td>
-                            <td><?php echo htmlspecialchars($course['description'] ?: 'No description'); ?></td>
-                            <td><?php echo $course['price'] == 0 ? 'Free' : number_format($course['price']) . ' VND'; ?></td>
-                            <td><?php echo htmlspecialchars($course['instructor']); ?></td>
+                            <td style="text-align: left;"><?php echo htmlspecialchars($course['title']); ?></td>
+                            <td><?php echo '$' . number_format($course['price'], 2); ?></td>
+                            <td><?php echo htmlspecialchars($course['instructor_name'] ?? 'Unknown Instructor'); ?></td>
+                            <td>
+                                <img src="<?php echo htmlspecialchars($course['image_path'] ?? '/assets/images/default_image.jpg'); ?>" 
+                                     alt="Course Image" class="rounded" style="width: 60px; height: 60px; object-fit: cover;">
+                            </td>
                             <td><?php echo date('d/m/Y H:i', strtotime($course['created_at'])); ?></td>
                             <td>
-                                <div class="btn-group">
-                                    <a href="/admin/manage_courses.php?edit_id=<?php echo $course['id']; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                                    <form action="/controllers/course_action.php" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this course?');">
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
-                                        <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                                    </form>
-                                </div>
+                                <form action="manage_courses.php" method="POST" style="display:inline;" onsubmit="return confirm('Delete this course?');">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="course_id" value="<?php echo $course['id']; ?>">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -158,6 +112,6 @@ include_once '../includes/header.php';
     </div>
 </div>
 
-<?php
-include_once '../includes/footer.php';
-?>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<?php include_once '../includes/footer.php'; ?>

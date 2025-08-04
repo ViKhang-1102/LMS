@@ -5,7 +5,7 @@ protectPage();
 include_once '../config/db.php';
 
 $currentUser = getCurrentUser($pdo);
-$isInstructor = $currentUser['role'] === 'admin';
+$isInstructor = $currentUser['role'] === 'instructor' || $currentUser['role'] === 'admin';
 
 try {
     if ($isInstructor) {

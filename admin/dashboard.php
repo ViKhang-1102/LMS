@@ -35,7 +35,6 @@ include_once '../includes/header.php';
 <h2 class="mb-4">Admin Dashboard</h2>
 <p>Welcome, <?php echo htmlspecialchars($currentUser['username']); ?>!</p>
 
-<!-- Statistics Overview -->
 <div class="row mb-4">
     <div class="col-md-4">
         <div class="card text-white bg-primary">
@@ -63,7 +62,6 @@ include_once '../includes/header.php';
     </div>
 </div>
 
-<!-- Quick Links -->
 <div class="card mb-4">
     <div class="card-header">
         <h3><i class="fas fa-link"></i> Quick Links</h3>
@@ -74,76 +72,12 @@ include_once '../includes/header.php';
                 <a href="/admin/users.php" class="btn btn-primary w-100 mb-2"><i class="fas fa-users-cog"></i> Manage Users</a>
             </div>
             <div class="col-md-4">
-                <a href="/pages/courses.php" class="btn btn-primary w-100 mb-2"><i class="fas fa-book"></i> Manage Courses</a>
+                <a href="/admin/manage_courses.php" class="btn btn-primary w-100 mb-2"><i class="fas fa-book"></i> Manage Courses</a>
             </div>
             <div class="col-md-4">
-                <a href="/pages/assignments.php" class="btn btn-primary w-100 mb-2"><i class="fas fa-tasks"></i> Manage Assignments</a>
+                <a href="/admin/manage_assignments.php" class="btn btn-primary w-100 mb-2"><i class="fas fa-tasks"></i> Manage Assignments</a>
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Recent Users -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h3><i class="fas fa-users"></i> Recent Users</h3>
-    </div>
-    <div class="card-body">
-        <?php if (empty($recentUsers)): ?>
-            <p>No users found.</p>
-        <?php else: ?>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($recentUsers as $user): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($user['username']); ?></td>
-                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                            <td><?php echo $user['role'] === 'admin' ? 'Administrator' : 'Student'; ?></td>
-                            <td><?php echo date('d/m/Y H:i', strtotime($user['created_at'])); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
-    </div>
-</div>
-
-<!-- Recent Courses -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h3><i class="fas fa-book"></i> Recent Courses</h3>
-    </div>
-    <div class="card-body">
-        <?php if (empty($recentCourses)): ?>
-            <p>No courses found.</p>
-        <?php else: ?>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Created At</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($recentCourses as $course): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($course['title']); ?></td>
-                            <td><?php echo htmlspecialchars($course['description'] ?: 'No description'); ?></td>
-                            <td><?php echo date('d/m/Y H:i', strtotime($course['created_at'])); ?></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
     </div>
 </div>
 
