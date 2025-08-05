@@ -54,16 +54,17 @@ try {
 
     $threeMonthsAgo = date('Y-m-d H:i:s', strtotime('-3 months'));
     $stmt = $pdo->prepare("
-        SELECT u.role, SUM(c.price) as total_price
+        SELECT u.username, u.role, SUM(c.price) as total_price
         FROM purchases p
         JOIN courses c ON p.course_id = c.id
         JOIN users u ON c.instructor_id = u.id
         WHERE p.purchased_at >= ?
-        GROUP BY u.role
+        GROUP BY u.id, u.username, u.role
+        ORDER BY total_price DESC
     ");
     $stmt->execute([$threeMonthsAgo]);
-    $priceByRoleStats = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $totalPrice3Months = array_sum(array_column($priceByRoleStats, 'total_price'));
+    $priceByInstructorStats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $totalPrice3Months = array_sum(array_column($priceByInstructorStats, 'total_price'));
 
 } catch (PDOException $e) {
     error_log("Error fetching analytics: " . $e->getMessage());
@@ -120,7 +121,7 @@ $error = $_GET['error'] ?? '';
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card h-100">
-                <div class="card-header bg-light"><strong>Total Price by Role (3 Months)</strong></div>
+                <div class="card-header bg-light"><strong>Total Price by Instructor (3 Months)</strong></div>
                 <div class="card-body" style="height:350px; display:flex; align-items:center; justify-content:center;">
                     <canvas id="priceChart" style="max-height:320px; max-width:100%;"></canvas>
                 </div>
@@ -185,11 +186,11 @@ const buyChart = new Chart(document.getElementById('buyChart'), {
 const priceChart = new Chart(document.getElementById('priceChart'), {
     type: 'pie',
     data: {
-        labels: [<?php echo implode(',', array_map(fn($p) => "'" . addslashes($p['role'] ?? 'Unknown') . "'", $priceByRoleStats)); ?>],
+        labels: [<?php echo implode(',', array_map(fn($p) => "'" . addslashes($p['username'] . ' (' . $p['role'] . ')') . "'", $priceByInstructorStats)); ?>],
         datasets: [{
             label: 'Total Price',
-            data: [<?php echo implode(',', array_map(fn($p) => $p['total_price'] ?? 0, $priceByRoleStats)); ?>],
-            backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40']
+            data: [<?php echo implode(',', array_map(fn($p) => $p['total_price'] ?? 0, $priceByInstructorStats)); ?>],
+            backgroundColor: ['#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0', '#9966ff', '#ff9f40', '#e67e22', '#2ecc71', '#e84393', '#00b894']
         }]
     },
     options: { responsive: true, plugins: { legend: { position: 'top' } } }
