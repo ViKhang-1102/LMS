@@ -1,0 +1,190 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-light: #f8f9fa;
+    --background-dark: #343a40;
+    --text-light: #212529;
+    --text-dark: #f8f9fa;
+    --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --background: var(--background-dark);
+    --text: var(--text-dark);
+    --card-bg: #495057;
+}
+
+[data-theme="light"] {
+    --background: var(--background-light);
+    --text: var(--text-light);
+    --card-bg: #ffffff;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+    font-family: 'Arial', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header.navbar {
+    box-shadow: var(--card-shadow);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    color: var(--primary-color) !important;
+}
+
+.nav-link {
+    color: var(--text) !important;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.container {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.card {
+    background-color: var(--card-bg);
+    border: none;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-title {
+    color: var(--primary-color);
+}
+
+.card-text {
+    color: var(--text);
+}
+
+.table {
+    background-color: var(--card-bg);
+    color: var(--text);
+}
+
+.table th {
+    background-color: var(--primary-color);
+    color: var(--text-dark);
+}
+
+.table-info {
+    background-color: rgba(var(--primary-color), 0.1) !important;
+}
+
+.form-control {
+    border-color: var(--secondary-color);
+    background-color: var(--card-bg);
+    color: var(--text);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-color), 0.25);
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.alert {
+    border-radius: 0.5rem;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .card {
+        margin-bottom: 15px;
+    }
+
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+}
+
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+#submissionChart, #paymentChart, #gradeChart {
+    max-height: 400px;
+}
+
+.messages-table .table-info {
+    font-weight: bold;
+}
+
+.profile-avatar {
+    border: 2px solid var(--primary-color);
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.list-group-item {
+    border: none;
+    margin-bottom: 10px;
+    box-shadow: var(--card-shadow);
+}
+.list-group-item h5 {
+    margin-bottom: 10px;
+}
+.list-group-item p {
+    margin-bottom: 5px;
+}
+.list-group-item a {
+    color: var(--primary-color);
+}
+.list-group-item a:hover {
+    text-decoration: underline;
+}
+.list-group-item small {
+    color: var(--secondary-color);
+    font-size: 0.85em;
+}
+.card {
+    background-color: var(--card-bg);
+    border: none;
+    box-shadow: var(--card-shadow);
+}
