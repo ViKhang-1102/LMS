@@ -1,3 +1,8 @@
+Author
+Name: Huynh Vi Khang - BC00429
+Place of work & study: BTEC FPT CAN THO
+Project: Final Assignment - LMS
+
 Learning Management System (LMS)
 
 Project Overview
@@ -24,8 +29,3 @@ Server: XAMPP (Apache + MySQL)
 <img width="1920" height="2181" alt="screencapture-localhost-3000-pages-dashboard-php-2025-08-13-18_57_58" src="https://github.com/user-attachments/assets/11a51946-1496-4e76-a8a0-5d0619fbc3d8" />
 
 <img width="1920" height="1926" alt="screencapture-localhost-3000-pages-course-details-php-2025-08-13-18_58_19" src="https://github.com/user-attachments/assets/31ae5efd-f2f5-43ee-9d59-d20f4cb06fb4" />
-
-Author
-Name: Huynh Vi Khang - BC00429
-Place of work & study: BTEC FPT CAN THO
-Project: Final Assignment - LMS
